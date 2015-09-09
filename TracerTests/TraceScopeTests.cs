@@ -31,6 +31,22 @@ namespace Tracing.Tests
             // logCallCount should be 2 as Tracer_OnLog should had been invoked two times.
             // One OnEnter and a 2nd OnLeave event.
             Assert.IsTrue(logCallCount == 2);
+
+            // invoke lambda expression code snippet
+            logCallCount = 0;
+            Tracer.InvokeVoid(
+                () =>
+                {
+                    HelloWorld("hi");
+                },
+                funcFootprint: "HelloWorld(\"hi\")"
+                );
+            Assert.IsTrue(logCallCount == 2);
+            logCallCount = 0;
+
+            // call method via Tracer.Invoke.
+            Tracer.Invoke(HelloWorld, "hi", funcFootprint: "HelloWorld(\"hi\")");
+            Assert.IsTrue(logCallCount == 2);
         }
 
         private static bool HelloWorld(string arg1)
