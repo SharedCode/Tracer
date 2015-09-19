@@ -23,11 +23,7 @@ namespace Tracing
         /// <summary>
         /// Default Constructor.
         /// </summary>
-        public Tracer()
-        {
-            Rethrow = true;
-            IsSuccessful = true;
-        }
+        public Tracer() { }
 
         #region Invoke Log Fail
         /// <summary>
@@ -117,7 +113,7 @@ namespace Tracing
                                                   out string message, InvokeVerbosity verbosity = InvokeVerbosity.Default,
                                                   bool? rethrowOnError = null, string funcFootprint = null)
         {
-            var funcParamText = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4) : 
+            var funcParamText = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4) :
                                                         HandleEmptyFootprint(funcFootprint);
             Func f = (out string s) => { return func(arg1, arg2, arg3, arg4, out s); };
             return invokeLogFail(f, out message, funcParamText, verbosity, rethrowOnError);
@@ -156,8 +152,8 @@ namespace Tracing
             InvokeVerbosity verbosity = InvokeVerbosity.Default, bool? rethrowOnError = null)
         {
             string s = null;
-            var r = invoke(() => { return func(out s); }, funcFootprint, true, 
-                (InvokeVerbosity) verbosity, rethrowOnError);
+            var r = invoke(() => { return func(out s); }, funcFootprint, true,
+                (InvokeVerbosity)verbosity, rethrowOnError);
             message = s;
             if (!r)
                 LogError(funcFootprint, message);
@@ -214,7 +210,7 @@ namespace Tracing
             }
         }
 
-        private const string BeforeCallingLiteral = "Entering {0}";
-        private const string AfterCallingLiteral = "Leaving {0}";
+        private const string BeforeCallingLiteral = "Entering {0}.";
+        private const string AfterCallingLiteral = "Leaving {0}.";
     }
 }

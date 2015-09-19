@@ -13,7 +13,6 @@ namespace Tracing.InvokeEngine
     /// </summary>
     public partial class InvokeWrapper : InvokeWrapperBase
     {
-        #region Events
         /// <summary>
         /// OnEnter event is raised before calling the submitted function for invoke.
         /// </summary>
@@ -54,6 +53,5 @@ namespace Tracing.InvokeEngine
                 throw new TraceException("Failed calling OnLeave event.", exc);
             }
         }
-        #endregion
     }
 }

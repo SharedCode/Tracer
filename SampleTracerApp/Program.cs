@@ -5,12 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 using Tracing;
 using Tracing.InvokeEngine;
+using Tracing.MSEnterpriseLogging;
 
 namespace SampleTracerApp
 {
     class Program
     {
         static void Main(string[] args)
+        {
+            Console.WriteLine("Running Enterprise Logging Tracer demo.");
+            DemoEnterpriseTracer();
+            Console.WriteLine("Running Tracer logging to Console demo.");
+            DemoTracerToConsole();
+            Console.WriteLine();
+            Console.WriteLine("Press <Enter> key to Quit.");
+            Console.ReadLine();
+        }
+        private static void DemoEnterpriseTracer()
+        {
+            EnterpriseTracer Tracer = new EnterpriseTracer(resultEvaluator: 
+                (object result, TimeSpan? runTime, out string customMessage) => 
+                {
+                    customMessage = null;
+                    return ResultActionType.Default;
+                });
+            Tracer.Invoke(Foo, funcFootprint: "Foo()");
+        }
+
+        private static void DemoTracerToConsole()
         {
             // hook up console writer/logger for this demo!
             var Tracer = new Tracer();
@@ -22,12 +44,8 @@ namespace SampleTracerApp
 
             // invoke FooThatThrows.
             var i = 123;
-            Tracer.Invoke(FooThatThrows, i, InvokeVerbosity.OnEnter, 
+            Tracer.Invoke(FooThatThrows, i, InvokeVerbosity.OnEnter,
                 funcFootprint: string.Format("FooThatThrows({0})", i));
-
-            Console.WriteLine();
-            Console.WriteLine("Press <Enter> key to Quit.");
-            Console.ReadLine();
         }
 
         private static void Tracer_OnException(Exception exc, string functionInfo)

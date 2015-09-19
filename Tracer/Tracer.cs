@@ -52,7 +52,7 @@ namespace Tracing
             {
                 if (_onLogExceptionHandler != null)
                 {
-                    _onLogExceptionHandler(EventType.OnException, exc, Format("Failed calling {0}.", functionInfo));
+                    _onLogExceptionHandler(exc, Format("Failed calling {0}.", functionInfo));
                     return true;
                 }
             }
@@ -75,12 +75,12 @@ namespace Tracing
 
         #region Logging
 
-        public event OnEventExceptionDelegate OnLogException
+        public event OnExceptionDelegate OnLogException
         {
             add { _onLogExceptionHandler += value; }
             remove { _onLogExceptionHandler -= value; }
         }
-        private event OnEventExceptionDelegate _onLogExceptionHandler;
+        private event OnExceptionDelegate _onLogExceptionHandler;
         public event OnLogDelegate OnLog
         {
             add { _onLogHandler += value; }
@@ -88,30 +88,12 @@ namespace Tracing
         }
         private event OnLogDelegate _onLogHandler;
 
-        #region Log Formatting functions
-        /// <summary>
-        /// Utility function for Formatting text msg and optional messageArgs.
-        /// </summary>
-        /// <param name="messageFormat">Text message containing formatting section.</param>
-        /// <param name="messageArgs">Arguments to be rendered/formatted part of the Text message.</param>
-        /// <returns>Actual formatted text that got logged.</returns>
-        private static string Format(string messageFormat, params object[] messageArgs)
-        {
-            string data;
-            if (messageFormat != null && messageArgs != null && messageArgs.Length > 0)
-                data = string.Format(messageFormat, messageArgs);
-            else
-                data = messageFormat;
-            return data;
-        }
-        #endregion
-
         /// <summary>
         /// Convert internally used LogLevel into .Net Trace Event Type.
         /// </summary>
         /// <param name="logLevel"></param>
         /// <returns></returns>
-        public System.Diagnostics.TraceEventType Convert(LogLevels logLevel)
+        static public System.Diagnostics.TraceEventType Convert(LogLevels logLevel)
         {
             return logLevel == LogLevels.Verbose ? System.Diagnostics.TraceEventType.Verbose :
                             logLevel == LogLevels.Information ? System.Diagnostics.TraceEventType.Information :
@@ -120,6 +102,6 @@ namespace Tracing
                             System.Diagnostics.TraceEventType.Critical;
         }
         #endregion
-        private LogLevels _tracingLogLevel = LogLevels.Verbose;
+        private LogLevels _tracingLogLevel = LogLevels.Information;
     }
 }

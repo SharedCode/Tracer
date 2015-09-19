@@ -37,7 +37,7 @@ namespace Tracing
                 throw new ArgumentNullException("tracer");
             _tracer = tracer;
             _verbosity = verbosity;
-            tracer.HandleEmptyFootprint(funcFootprint);
+            funcFootprint = tracer.HandleEmptyFootprint(funcFootprint);
             _funcFootprint = funcFootprint;
             _rethrowOnError = rethrowOnError;
             _tracer.OnEnterHandler(funcFootprint);
@@ -45,11 +45,20 @@ namespace Tracing
                 return;
             _startTime = DateTime.Now;
         }
+        /// <summary>
+        /// Set to the result of the block or return of the method call.
+        /// NOTE: this value will be submitted as parameter to the OnLeave event handler
+        /// to allow it to evaluate what to do based on the Result.
+        /// </summary>
+        public object Result { get; set; }
+        /// <summary>
+        /// Dispose this instance.
+        /// </summary>
         public void Dispose()
         {
             if (_tracer == null)
                 return;
-            _tracer.OnLeaveHandler(null, _funcFootprint, _tracer.GetRunTime(_startTime));
+            _tracer.OnLeaveHandler(Result, _funcFootprint, _tracer.GetRunTime(_startTime));
             _tracer = null;
         }
     }

@@ -10,25 +10,6 @@ namespace Tracing.InvokeEngine
 {
     #region Event Delegates
     /// <summary>
-    /// Event Type.
-    /// </summary>
-    public enum EventType
-    {
-        /// <summary>
-        /// OnEnter event is raised before calling the method.
-        /// </summary>
-        OnEnter,
-        /// <summary>
-        /// OnLeave event is raised aftrer calling the method.
-        /// </summary>
-        OnLeave,
-        /// <summary>
-        /// OnException event is raised when an exception is 
-        /// detected while calling the method.
-        /// </summary>
-        OnException
-    }
-    /// <summary>
     /// On Exception Delegate.
     /// </summary>
     /// <param name="exc"></param>
@@ -105,7 +86,7 @@ namespace Tracing.InvokeEngine
         private bool _invokeTracing = true;
 
 
-        #region Logging
+        #region Exception events
         internal protected virtual bool OnExceptionHandler(System.Exception exc, string funcFootprint,
             InvokeVerbosity verbosity = InvokeVerbosity.Default)
         {
@@ -114,25 +95,20 @@ namespace Tracing.InvokeEngine
             //// only call exception if verbosity flag for it is set.
             //if (!IsSet(verbosity, InvokeVerbosity.OnException))
             //    return;
-            if (_onExceptionHandler != null)
-            {
-                _onExceptionHandler(exc, funcFootprint);
-                return true;
-            }
-            return false;
+            if (_onExceptionHandler == null)
+                return false;
+            _onExceptionHandler(exc, funcFootprint);
+            return true;
         }
         /// <summary>
-        /// Implement this to handle event handling exceptions.
+        /// Implement this to handle on event exception handling.
         /// </summary>
         /// <param name="exc"></param>
         virtual protected void OnEventExceptionHandler(EventType eventType, Exception exc, string funcFootprint)
         {
-            if (_onEventExceptionHandler != null)
-            {
-                _onEventExceptionHandler(eventType, exc, funcFootprint);
-                return;
-            }
-            throw exc;
+            if (_onEventExceptionHandler == null)
+                throw exc;
+            _onEventExceptionHandler(eventType, exc, funcFootprint);
         }
         #endregion
     }

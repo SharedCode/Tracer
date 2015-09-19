@@ -29,7 +29,6 @@ namespace Tracing.InvokeEngine
         /// </summary>
         public InvokeWrapperBase()
         {
-            Rethrow = true;
             IsSuccessful = true;
         }
 
@@ -126,7 +125,7 @@ namespace Tracing.InvokeEngine
                             T3 arg3, T4 arg4, InvokeVerbosity verbosity = InvokeVerbosity.Default,
                             bool? rethrowOnError = null, string funcFootprint = null)
         {
-            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4) : 
+            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4) :
                                             HandleEmptyFootprint(funcFootprint);
             return invoke(() => { return func(arg1, arg2, arg3, arg4); }, s, verbosity: verbosity, rethrowOnError: rethrowOnError);
         }
@@ -149,7 +148,7 @@ namespace Tracing.InvokeEngine
                             T3 arg3, T4 arg4, T5 arg5, InvokeVerbosity verbosity = InvokeVerbosity.Default,
                             bool? rethrowOnError = null, string funcFootprint = null)
         {
-            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4, arg5) : 
+            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4, arg5) :
                                             HandleEmptyFootprint(funcFootprint);
             return invoke(() => { return func(arg1, arg2, arg3, arg4, arg5); }, s, verbosity: verbosity, rethrowOnError: rethrowOnError);
         }
@@ -172,7 +171,7 @@ namespace Tracing.InvokeEngine
                             T3 arg3, T4 arg4, T5 arg5, T6 arg6, InvokeVerbosity verbosity = InvokeVerbosity.Default,
                             bool? rethrowOnError = null, string funcFootprint = null)
         {
-            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4, arg5, arg6) : 
+            var s = funcFootprint == null ? Format(func.Method, verbosity, arg1, arg2, arg3, arg4, arg5, arg6) :
                                             HandleEmptyFootprint(funcFootprint);
             return invoke(() => { return func(arg1, arg2, arg3, arg4, arg5, arg6); }, s, verbosity: verbosity, rethrowOnError: rethrowOnError);
         }
@@ -321,6 +320,23 @@ namespace Tracing.InvokeEngine
             invokeVoid(() => { func(arg1); }, s, verbosity, rethrowOnError);
         }
         #region Formatters
+
+        /// <summary>
+        /// Utility function for Formatting text msg and optional messageArgs.
+        /// </summary>
+        /// <param name="messageFormat">Text message containing formatting section.</param>
+        /// <param name="messageArgs">Arguments to be rendered/formatted part of the Text message.</param>
+        /// <returns>Actual formatted text that got logged.</returns>
+        public static string Format(string messageFormat, params object[] messageArgs)
+        {
+            string data;
+            if (messageFormat != null && messageArgs != null && messageArgs.Length > 0)
+                data = string.Format(messageFormat, messageArgs);
+            else
+                data = messageFormat;
+            return data;
+        }
+
         protected virtual string Format(MethodInfo method, string formattedMethodParams = null)
         {
             // Retrieving method name using Declaring type is found to be quick, no perf issue.
@@ -374,7 +390,18 @@ namespace Tracing.InvokeEngine
         /// <summary>
         /// true will cause rethrow when exception is encountered.
         /// </summary>
-        public bool Rethrow { get; set; }
+        public bool Rethrow
+        {
+            get
+            {
+                return (_rethrow == null && _onExceptionHandler == null) || _rethrow.Value ? true : false;
+            }
+            set
+            {
+                _rethrow = value;
+            }
+        }
+        private bool? _rethrow;
 
         /// <summary>
         /// Contains the exception encountered after the last Invoke
@@ -404,7 +431,7 @@ namespace Tracing.InvokeEngine
         /// <summary>
         /// Singleton instance.
         /// </summary>
-        public static InvokeWrapper Instance { get; set; }
+        public static InvokeWrapperBase Instance { get; set; }
 
         /// <summary>
         /// false disables tracing globally.

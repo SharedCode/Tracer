@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MSEnterpriseLogging\Tracing.MSEnterpriseLogging.csproj">
+      <Project>{1f9785aa-c98e-4634-8134-2387d6fc6528}</Project>
+      <Name>Tracing.MSEnterpriseLogging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tracer\Tracing.csproj">
       <Project>{46bf96bd-440d-4dc4-bf3c-3b9afa410624}</Project>
       <Name>Tracing</Name>
