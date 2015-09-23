@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Practices.EnterpriseLibrary.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,9 @@ namespace SampleTracerApp
     {
         static void Main(string[] args)
         {
+            // initialize MSEL static log writer as is used by the "MSEL hooks" in Tracing MSEnterpriseLogging library.
+            Logger.SetLogWriter(new LogWriterFactory().Create(), false);
+
             Console.WriteLine("Running Enterprise Logging Tracer demo.");
             DemoEnterpriseTracer();
             Console.WriteLine("Running Tracer logging to Console demo.");
@@ -35,7 +39,7 @@ namespace SampleTracerApp
         private static void DemoTracerToConsole()
         {
             // hook up console writer/logger for this demo!
-            var Tracer = new Tracer();
+            var Tracer = new Tracing.Tracer();
             Tracer.OnLog += Tracer_OnLog;
             Tracer.OnException += Tracer_OnException;
             // invoke Foo via Tracer to generate code tracing useful logs on Enter, [on Exit], [on Exception].
