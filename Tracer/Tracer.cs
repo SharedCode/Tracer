@@ -10,6 +10,34 @@ using Tracing.InvokeEngine;
 namespace Tracing
 {
     /// <summary>
+    /// Result action type enumeration can be Pass, Fail or None.
+    /// Interpret ResultActionType in your OnLeave event handler
+    /// to drive what to do, e.g. - log pass message if Result
+    /// passed, fail message if Result failed or don't do anything
+    /// (skip logging on OnLeave event) if None.
+    /// Default may log Trace msg like "Leaving method...".
+    /// </summary>
+    public enum ResultActionType
+    {
+        Default,
+        Pass,
+        Fail,
+        None
+    }
+    /// <summary>
+    /// Invoked method result evaluator delegate.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="runTime"></param>
+    /// <param name="customMessage"></param>
+    /// <returns>true typically means pass or successful.
+    /// Use-case example: team up this return value with your custom OnLeave event
+    /// handler to cook up some logic that logs pass or fail message based on
+    /// return of this evaluator function.
+    /// </returns>
+    public delegate ResultActionType ResultEvaluatorDelegate(object result, TimeSpan? runTime, out string customMessage);
+
+    /// <summary>
     /// On Log event delegate.
     /// </summary>
     /// <param name="logLevel"></param>
@@ -41,6 +69,25 @@ namespace Tracing
             }
         }
 
+        /// <summary>
+        /// Default Category.
+        /// </summary>
+        public static string DefaultCategory = "General";
+        /// <summary>
+        /// Log Category.
+        /// </summary>
+        public string[] Category { get; set; }
+
+        /// <summary>
+        /// OnLeave event is raised after calling the submitted function for invoke.
+        /// </summary>
+        public event OnLeaveDelegate OnLeave
+        {
+            add { _onLeaveHandler += value; }
+            remove { _onLeaveHandler -= value; }
+        }
+        private event OnLeaveDelegate _onLeaveHandler;
+
         internal protected override bool OnExceptionHandler(Exception exc, string functionInfo, InvokeVerbosity verbosity = InvokeVerbosity.Verbose)
         {
             if (base.OnExceptionHandler(exc, functionInfo, verbosity))
@@ -62,17 +109,6 @@ namespace Tracing
             }
             return false;
         }
-
-        //public string GetRunTime(string functionFootPrint, DateTime startTime)
-        //{
-        //    return string.Format("{0}, run time(secs): {1}", functionFootPrint, DateTime.Now.Subtract(startTime).TotalSeconds);
-        //}
-        //public string GetRunTime(MethodInfo method, DateTime startTime)
-        //{
-        //    var funcName = Format(method);
-        //    return GetRunTime(funcName, startTime);
-        //}
-
         #region Logging
 
         public event OnExceptionDelegate OnLogException
@@ -87,6 +123,11 @@ namespace Tracing
             remove { _onLogHandler -= value; }
         }
         private event OnLogDelegate _onLogHandler;
+
+        /// <summary>
+        /// Result Evaluator.
+        /// </summary>
+        public ResultEvaluatorDelegate ResultEvaluator { get; set; }
 
         /// <summary>
         /// Convert internally used LogLevel into .Net Trace Event Type.

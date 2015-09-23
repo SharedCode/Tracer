@@ -37,7 +37,6 @@
     <Compile Include="InvokeEngine\EventType.cs" />
     <Compile Include="InvokeEngine\InvokeWrapperBase.cs" />
     <Compile Include="InvokeVerbosity.cs" />
-    <Compile Include="SlimTracer.cs" />
     <Compile Include="TraceException.cs" />
     <Compile Include="Tracer.cs" />
     <Compile Include="InvokeEngine\InvokeWrapper.cs" />

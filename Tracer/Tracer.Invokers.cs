@@ -23,7 +23,16 @@ namespace Tracing
         /// <summary>
         /// Default Constructor.
         /// </summary>
-        public Tracer() { }
+        public Tracer() : this(null) { }
+        public Tracer(string[] category = null,
+            ResultEvaluatorDelegate resultEvaluator = null)
+        {
+            ResultEvaluator = resultEvaluator;
+            // set the log Category.
+            Category = new string[] { DefaultCategory };
+            if (category != null)
+                Category = category;
+        }
 
         #region Invoke Log Fail
         /// <summary>
@@ -175,17 +184,71 @@ namespace Tracing
         }
         internal protected override void OnLeaveHandler(object result, string funcFootprint, TimeSpan? runTime)
         {
+            if (_onLeaveHandler != null)
+            {
+                if (ResultEvaluator != null)
+                    throw new NotSupportedException("Can't specify both ResultEvaluator & OnLeave event handlers.");
+                try
+                {
+                    _onLeaveHandler(result, funcFootprint, runTime);
+                    return;
+                }
+                catch (Exception exc)
+                {
+                    throw new TraceException("Failed calling OnLeave event.", exc);
+                }
+            }
             if (_onLogHandler == null) return;
+            var message = funcFootprint;
             try
             {
-                var s = funcFootprint;
                 if (runTime != null)
-                    s = string.Format("{0}, run time(secs): {1}", funcFootprint, runTime.Value.TotalSeconds);
-                _onLogHandler(_tracingLogLevel, Format(AfterCallingLiteral, s));
+                    message = string.Format("{0}, run time(secs): {1}", funcFootprint, runTime.Value.TotalSeconds);
+                string customMessage = "";
+                if (ResultEvaluator != null)
+                {
+                    ResultActionType r = ResultActionType.Default;
+                    try
+                    {
+                        ResultEvaluator(result, runTime, out customMessage);
+                    }
+                    catch (System.Exception exc)
+                    {
+                        throw new TraceException(Format("OnLeave event ResultEvaluator call failed, details: {0}.", message), exc);
+                    }
+                    switch (r)
+                    {
+                        case ResultActionType.None:
+                            return;
+                        case ResultActionType.Pass:
+                            if (string.IsNullOrWhiteSpace(customMessage))
+                                _onLogHandler(LogLevels.Information, Format("Successful call {0}.", message));
+                            else
+                                _onLogHandler(LogLevels.Information, Format("Successful call {0}, details: {1}.",
+                                    message, customMessage));
+                            return;
+                        case ResultActionType.Fail:
+                            if (string.IsNullOrWhiteSpace(customMessage))
+                                _onLogHandler(LogLevels.Information, Format("Failed call {0}.", message));
+                            else
+                                _onLogHandler(LogLevels.Information, Format("Failed call {0}, details: {1}.",
+                                    message, customMessage));
+                            return;
+                        case ResultActionType.Default:
+                            break;
+                        default:
+                            throw new NotSupportedException(string.Format("ResultAction {0} not supported.", r));
+                    }
+                }
+                message = Format(AfterCallingLiteral, message);
+                if (string.IsNullOrWhiteSpace(customMessage))
+                    _onLogHandler(_tracingLogLevel, Format(AfterCallingLiteral, message));
+                else
+                    _onLogHandler(_tracingLogLevel, Format("Leaving {0}, details: {1}.", message, customMessage));
             }
-            catch (Exception exc)
+            catch (System.Exception exc)
             {
-                throw new TraceException("Failed calling OnEnter event.", exc);
+                throw new TraceException(Format("Failed calling OnLeave event, details: {0}.", message), exc);
             }
         }
         internal override protected string HandleEmptyFootprint(string footprint)

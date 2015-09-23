@@ -18,7 +18,7 @@ namespace Tracing.MSEnterpriseLogging
     /// NOTE: this is just a sample reference implementation.
     /// Change it based on your needs, tastes and req'ts.
     /// </summary>
-    public class EnterpriseTracer : Tracing.SlimTracer
+    public class EnterpriseTracer : Tracing.Tracer
     {
         public EnterpriseTracer() : this(null, null) { }
         /// <summary>
