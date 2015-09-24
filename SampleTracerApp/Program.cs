@@ -25,6 +25,11 @@ namespace SampleTracerApp
             Console.WriteLine("Running Tracer Logging to Console demo.");
             DemoTracerToConsole();
             Console.WriteLine();
+
+            Console.WriteLine("Running TraceScope to Console demo.");
+            DemoTraceScopeToConsole();
+            Console.WriteLine();
+
             Console.WriteLine("Press <Enter> key to Quit.");
             Console.ReadLine();
         }
@@ -38,6 +43,35 @@ namespace SampleTracerApp
                     return ResultActionType.Default;
                 });
             Tracer.Invoke(Foo, funcFootprint: "Foo()");
+        }
+
+        private static void DemoTraceScopeToConsole()
+        {
+            // hook up console writer/logger for this demo!
+            var Tracer = new Tracing.Tracer();
+            Tracer.OnLog += Tracer_OnLog;
+            Tracer.OnException += Tracer_OnException;
+            using (new TraceScope<Tracing.Tracer>(Tracer, "Foo()"))
+            {
+                // invoke Foo via Tracer to generate code tracing useful logs on Enter, [on Exit].
+                // run time measurement is also logged on generated "on Exit" logs.
+                Foo();
+            }
+            // invoke FooThatThrows.
+            var i = 123;
+            try
+            {
+                using (new TraceScope<Tracing.Tracer>(Tracer, string.Format("FooThatThrows({0})", i),
+                    InvokeVerbosity.OnEnter))
+                {
+                    FooThatThrows(i);
+                    // NOTE: OnLeave will not be invoked because verbosity is set to "OnEnter" only.
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Caught an exception.");
+            }
         }
 
         private static void DemoTracerToConsole()

@@ -96,7 +96,8 @@ namespace Tracing
                 _tracerCategory = ((Tracer)_tracer).Category;
                 ((Tracer)_tracer).Category = category;
             }
-            _tracer.OnEnterHandler(funcFootprint);
+            if (_tracer.IsSet(verbosity, InvokeVerbosity.OnEnter))
+                _tracer.OnEnterHandler(funcFootprint);
             if (_tracer.IsSet(verbosity, InvokeVerbosity.NoRunTimeMeasurement))
                 return;
             _startTime = DateTime.Now;
@@ -114,7 +115,8 @@ namespace Tracing
         {
             if (_tracer == null)
                 return;
-            _tracer.OnLeaveHandler(Result, _funcFootprint, _tracer.GetRunTime(_startTime));
+            if (_tracer.IsSet(_verbosity, InvokeVerbosity.OnLeave))
+                _tracer.OnLeaveHandler(Result, _funcFootprint, _tracer.GetRunTime(_startTime));
             if (_tracer is Tracer)
             {
                 ((Tracer)_tracer).Category = _tracerCategory;
