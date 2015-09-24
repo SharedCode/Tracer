@@ -14,6 +14,8 @@ namespace Tracing.Tests
             Tracer.OnLog += Tracer_OnLog;
         }
 
+
+
         private void Tracer_OnLog(LogLevels logLevel, string message)
         {
         }

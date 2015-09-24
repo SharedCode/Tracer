@@ -240,7 +240,6 @@ namespace Tracing
                             throw new NotSupportedException(string.Format("ResultAction {0} not supported.", r));
                     }
                 }
-                message = Format(AfterCallingLiteral, message);
                 if (string.IsNullOrWhiteSpace(customMessage))
                     _onLogHandler(_tracingLogLevel, Format(AfterCallingLiteral, message));
                 else

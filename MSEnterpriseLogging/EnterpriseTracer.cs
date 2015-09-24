@@ -13,6 +13,38 @@ using Microsoft.Practices.EnterpriseLibrary.Logging;
 namespace Tracing.MSEnterpriseLogging
 {
     /// <summary>
+    /// Enterprise TraceScope.
+    /// </summary>
+    public class TraceScope : TraceScope<EnterpriseTracer>
+    {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="funcFootprint"></param>
+        /// <param name="verbosity"></param>
+        /// <param name="category"></param>
+        public TraceScope(string funcFootprint = null,
+            InvokeVerbosity verbosity = InvokeVerbosity.Default,
+            string[] category = null)
+            : base(null, funcFootprint, verbosity, null, category)
+        { }
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="tracer"></param>
+        /// <param name="funcFootprint"></param>
+        /// <param name="verbosity"></param>
+        /// <param name="rethrowOnError"></param>
+        /// <param name="category"></param>
+        public TraceScope(EnterpriseTracer tracer,
+            string funcFootprint = null,
+            InvokeVerbosity verbosity = InvokeVerbosity.Default,
+            bool? rethrowOnError = null, string[] category = null)
+            : base(tracer, funcFootprint, verbosity, rethrowOnError, category)
+        { }
+    }
+
+    /// <summary>
     /// Enterprise Tracer is the Tracer's adaptation to 
     /// Microsoft Enterprise Logging Framework.
     /// NOTE: this is just a sample reference implementation.

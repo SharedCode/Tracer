@@ -24,7 +24,7 @@ namespace Tracing.Tests
         {
             // using TraceScope will implicitly call OnEnter and OnLeave event loggers
             // in ctor and Dispose methods of TraceScope.
-            using (new TraceScope(Tracer, funcFootprint: "HelloWorld(\"hi\")"))
+            using (new TraceScope(Tracer, "HelloWorld(\"hi\")"))
             {
                 HelloWorld("hi");
             }
