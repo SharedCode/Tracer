@@ -210,7 +210,7 @@ namespace Tracing
                     ResultActionType r = ResultActionType.Default;
                     try
                     {
-                        ResultEvaluator(result, runTime, out customMessage);
+                        r = ResultEvaluator(result, runTime, out customMessage);
                     }
                     catch (System.Exception exc)
                     {

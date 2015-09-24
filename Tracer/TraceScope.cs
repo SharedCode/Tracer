@@ -15,13 +15,23 @@ namespace Tracing
     /// minue the Exception handling portion. Your code has to handle
     /// exception (event) handling or logging.
     /// </summary>
-    public class TraceScope : IDisposable
+    public class TraceScope : Attribute, IDisposable
     {
         private InvokeEngine.InvokeWrapperBase _tracer;
         private InvokeVerbosity _verbosity;
         private bool? _rethrowOnError;
         private string _funcFootprint;
         private DateTime _startTime;
+
+        /// <summary>
+        /// Constructor primarily for use in 'Attribute usage' pattern.
+        /// </summary>
+        /// <param name="funcFootprint"></param>
+        /// <param name="verbosity"></param>
+        public TraceScope(string funcFootprint = null, InvokeVerbosity verbosity = InvokeVerbosity.Default)
+            : this(Tracer.Instance, funcFootprint, verbosity, null)
+        { }
+
         /// <summary>
         /// Constructor expects parameters for use in calling method Invoke function.
         /// </summary>

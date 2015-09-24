@@ -14,17 +14,21 @@ namespace SampleTracerApp
     {
         static void Main(string[] args)
         {
-            // initialize MSEL static log writer as is used by the "MSEL hooks" in Tracing MSEnterpriseLogging library.
+            // initialize MSEL static log writer as is used by the 
+            // "MSEL hooks" in Tracing MSEnterpriseLogging library.
             Logger.SetLogWriter(new LogWriterFactory().Create(), false);
 
             Console.WriteLine("Running Enterprise Logging Tracer demo.");
             DemoEnterpriseTracer();
-            Console.WriteLine("Running Tracer logging to Console demo.");
+            Console.WriteLine("Pls. check your MSEL log file for messages logged by the demo.");
+            Console.WriteLine();
+            Console.WriteLine("Running Tracer Logging to Console demo.");
             DemoTracerToConsole();
             Console.WriteLine();
             Console.WriteLine("Press <Enter> key to Quit.");
             Console.ReadLine();
         }
+
         private static void DemoEnterpriseTracer()
         {
             EnterpriseTracer Tracer = new EnterpriseTracer(resultEvaluator: 
