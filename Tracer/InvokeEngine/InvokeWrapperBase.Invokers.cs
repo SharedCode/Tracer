@@ -427,11 +427,32 @@ namespace Tracing.InvokeEngine
                 }
             }
         }
+        /// <summary>
+        /// Set singleton Instance to an instance.
+        /// Thread safe.
+        /// </summary>
+        /// <param name="tracer"></param>
+        /// <param name="throwIfSet"></param>
+        public static void SetTracer(InvokeWrapperBase tracer, bool throwIfSet = false)
+        {
+            if (tracer == null)
+                throw new ArgumentNullException("tracer");
+            var msg = "InvokeWrapperBase.Instance is already set.";
+            if (Instance != null && throwIfSet)
+                throw new InvalidOperationException(msg);
+            lock(_locker)
+            {
+                if (Instance != null && throwIfSet)
+                    throw new InvalidOperationException(msg);
+                Instance = tracer;
+            }
+        }
+        private static object _locker = new object();
 
         /// <summary>
         /// Singleton instance.
         /// </summary>
-        public static InvokeWrapperBase Instance { get; set; }
+        public static InvokeWrapperBase Instance { get; private set; }
 
         /// <summary>
         /// false disables tracing globally.
