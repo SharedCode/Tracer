@@ -1,11 +1,6 @@
 ﻿using Microsoft.Practices.EnterpriseLibrary.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tracing;
-using Tracing.InvokeEngine;
 using Tracing.MSEnterpriseLogging;
 
 namespace SampleTracerApp
@@ -31,7 +26,7 @@ namespace SampleTracerApp
             Console.WriteLine();
 
             Console.WriteLine("Running TraceScope using singleton Tracer, log to Console demo.");
-            DemoTraceScopeNoTracerParamLogToConsole();
+            DemoTraceScopeUsingSingletonTracer();
             Console.WriteLine();
 
             Console.WriteLine("Press <Enter> key to Quit.");
@@ -40,19 +35,21 @@ namespace SampleTracerApp
 
         private static void DemoEnterpriseTracer()
         {
-            EnterpriseTracer Tracer = new EnterpriseTracer(resultEvaluator: 
-                (object result, TimeSpan? runTime, out string customMessage) => 
-                {
-                    customMessage = null;
-                    return ResultActionType.Default;
-                });
+            ResultEvaluatorDelegate re = (object result, TimeSpan? runTime, out string customMessage) =>
+            {
+                customMessage = null;
+                return ResultActionType.Default;
+            };
+
+            EnterpriseTracer Tracer = new EnterpriseTracer(category: new string[] { "DemoTraceScopeToConsole" },
+                resultEvaluator: re);
             Tracer.Invoke(Foo, funcFootprint: "Foo()");
         }
 
         private static void DemoTraceScopeToConsole()
         {
             // hook up console writer/logger for this demo!
-            var Tracer = new Tracing.Tracer();
+            var Tracer = new Tracing.Tracer(category: new string[] { "DemoTraceScopeToConsole" });
             Tracer.OnLog += Tracer_OnLog;
             Tracer.OnException += Tracer_OnException;
             using (new TraceScope<Tracing.Tracer>(Tracer, "Foo()"))
@@ -79,14 +76,18 @@ namespace SampleTracerApp
         }
 
 
-        private static void DemoTraceScopeNoTracerParamLogToConsole()
+        private static void DemoTraceScopeUsingSingletonTracer()
         {
             // hook up console writer/logger for this demo!
-            var Tracer = new Tracing.Tracer();
+            var Tracer = new Tracing.Tracer(category: new string[] { "DemoTraceScopeAndSingletonTracer" });
             Tracer.OnLog += Tracer_OnLog;
             Tracer.OnException += Tracer_OnException;
             // Call SetTracer to setup singleton Tracer Instance.
+            // Setting up the singleton Tracer needs to be done once in App bootup.
             Tracing.Tracer.SetTracer(Tracer);
+
+            // Using Tracing.TraceScope passing no Tracer instance param 
+            // will use the singleton Tracer instance.
             using (new Tracing.TraceScope("Foo()"))
             {
                 // invoke Foo via Tracer to generate code tracing useful logs on Enter.
@@ -111,7 +112,7 @@ namespace SampleTracerApp
         private static void DemoTracerToConsole()
         {
             // hook up console writer/logger for this demo!
-            var Tracer = new Tracing.Tracer();
+            var Tracer = new Tracing.Tracer(category: new string[] { "DemoTracerToConsole" });
             Tracer.OnLog += Tracer_OnLog;
             Tracer.OnException += Tracer_OnException;
             // invoke Foo via Tracer to generate code tracing useful logs on Enter, [on Exit], [on Exception].
@@ -127,19 +128,22 @@ namespace SampleTracerApp
         private static void Tracer_OnException(Exception exc, string functionInfo)
         {
             var msg = string.Format("{0}, details: {1}", functionInfo, exc.ToString());
-            Tracer_OnLog(LogLevels.Fatal, msg);
+            Tracer_OnLog(LogLevels.Fatal, null, msg);
         }
-        private static void Tracer_OnLog(LogLevels logLevel, string message)
+        private static void Tracer_OnLog(LogLevels logLevel, string[] category, string message)
         {
             // just print to console to simulate logging!
-            var msg = string.Format("{0}: {1}, message: {2}", DateTime.Now, logLevel, message);
+            string cat = "None";
+            if (category != null)
+                cat = string.Join(", ", category);
+            var msg = string.Format("{0}: {1}, Category: {2}, Message: {3}", DateTime.Now, logLevel, cat, message);
             Console.WriteLine(msg);
         }
 
         static int Foo()
         {
             int a = 1 + 2;
-            Tracer_OnLog(LogLevels.Information, "Inside Foo.");
+            Tracer_OnLog(LogLevels.Information, null, "Inside Foo.");
             return a;
         }
         static int FooThatThrows(int arg1)

@@ -61,16 +61,16 @@ namespace Tracing.MSEnterpriseLogging
         {
             if (hookDefaultEventHandler)
             {
-                OnLog += (LogLevels logLevel, string message) => { Log(logLevel, message); };
+                OnLog += (LogLevels logLevel, string[] cat, string message) => { Log(logLevel, cat, message); };
                 OnLogException += LogException;
             }
         }
 
-        private void LogException(System.Exception exc, string message)
+        private void LogException(System.Exception exc, string[] category, string message)
         {
             try
             {
-                Log(LogLevels.Error, string.Format("{0} Details: {1}", message, exc.ToString()));
+                Log(LogLevels.Error, category, string.Format("{0} Details: {1}", message, exc.ToString()));
             }
             catch (System.Exception logExc)
             {
@@ -78,16 +78,16 @@ namespace Tracing.MSEnterpriseLogging
             }
         }
 
-        private void Log(LogLevels logLevel, string message, Dictionary<string, object> extendedProps = null)
+        private void Log(LogLevels logLevel, string[] category, string message, Dictionary<string, object> extendedProps = null)
         {
             try
             {
                 // Populate LogEntry w/ log message.
                 LogEntry logEntry = new LogEntry();
                 logEntry.Message = message;
-                if (Category != null)
+                if (category != null)
                 {
-                    foreach (var c in Category)
+                    foreach (var c in category)
                         logEntry.Categories.Add(c);
                 }
                 logEntry.Priority = 1;

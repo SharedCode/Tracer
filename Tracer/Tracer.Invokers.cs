@@ -175,7 +175,7 @@ namespace Tracing
             if (_onLogHandler == null) return;
             try
             {
-                _onLogHandler(_tracingLogLevel, Format(BeforeCallingLiteral, funcFootprint));
+                _onLogHandler(_tracingLogLevel, Category, Format(BeforeCallingLiteral, funcFootprint));
             }
             catch (Exception exc)
             {
@@ -222,16 +222,16 @@ namespace Tracing
                             return;
                         case ResultActionType.Pass:
                             if (string.IsNullOrWhiteSpace(customMessage))
-                                _onLogHandler(LogLevels.Information, Format("Successful call {0}.", message));
+                                _onLogHandler(LogLevels.Information, Category, Format("Successful call {0}.", message));
                             else
-                                _onLogHandler(LogLevels.Information, Format("Successful call {0}, details: {1}.",
+                                _onLogHandler(LogLevels.Information, Category, Format("Successful call {0}, details: {1}.",
                                     message, customMessage));
                             return;
                         case ResultActionType.Fail:
                             if (string.IsNullOrWhiteSpace(customMessage))
-                                _onLogHandler(LogLevels.Information, Format("Failed call {0}.", message));
+                                _onLogHandler(LogLevels.Information, Category, Format("Failed call {0}.", message));
                             else
-                                _onLogHandler(LogLevels.Information, Format("Failed call {0}, details: {1}.",
+                                _onLogHandler(LogLevels.Information, Category, Format("Failed call {0}, details: {1}.",
                                     message, customMessage));
                             return;
                         case ResultActionType.Default:
@@ -241,9 +241,9 @@ namespace Tracing
                     }
                 }
                 if (string.IsNullOrWhiteSpace(customMessage))
-                    _onLogHandler(_tracingLogLevel, Format(AfterCallingLiteral, message));
+                    _onLogHandler(_tracingLogLevel, Category, Format(AfterCallingLiteral, message));
                 else
-                    _onLogHandler(_tracingLogLevel, Format("Leaving {0}, details: {1}.", message, customMessage));
+                    _onLogHandler(_tracingLogLevel, Category, Format("Leaving {0}, details: {1}.", message, customMessage));
             }
             catch (System.Exception exc)
             {
@@ -264,7 +264,7 @@ namespace Tracing
             var errMessage = Format("Failed calling {0}, details: {1}", funcFootprint, message);
             try
             {
-                _onLogHandler(LogLevels.Error, errMessage);
+                _onLogHandler(LogLevels.Error, Category, errMessage);
             }
             catch (Exception exc)
             {

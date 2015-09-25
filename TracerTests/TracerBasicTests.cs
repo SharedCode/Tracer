@@ -16,7 +16,7 @@ namespace Tracing.Tests
             TracerLogThrows.OnLog += TracerLogThrows_OnLog;
         }
 
-        private void TracerLogThrows_OnLog(LogLevels logLevel, string message)
+        private void TracerLogThrows_OnLog(LogLevels logLevel, string[] category, string message)
         {
             // simulate an exception while logging. Like when logging hasn't been configured.
             throw new System.Exception("OnLog");

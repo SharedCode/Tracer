@@ -1,10 +1,5 @@
 // Tracer v1.0
 using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
 using Tracing.InvokeEngine;
 
 namespace Tracing
@@ -41,9 +36,16 @@ namespace Tracing
     /// On Log event delegate.
     /// </summary>
     /// <param name="logLevel"></param>
+    /// <param name="category"></param>
     /// <param name="message"></param>
-    /// <returns></returns>
-    public delegate void OnLogDelegate(LogLevels logLevel, string message);
+    public delegate void OnLogDelegate(LogLevels logLevel, string[] category, string message);
+
+    /// <summary>
+    /// On Exception Delegate.
+    /// </summary>
+    /// <param name="exc"></param>
+    /// <param name="message"></param>
+    public delegate void OnLogExceptionDelegate(Exception exc, string[] category, string message);
 
     /// <summary>
     /// Invoke Wrapper
@@ -99,7 +101,7 @@ namespace Tracing
             {
                 if (_onLogExceptionHandler != null)
                 {
-                    _onLogExceptionHandler(exc, Format("Failed calling {0}.", functionInfo));
+                    _onLogExceptionHandler(exc, Category, Format("Failed calling {0}.", functionInfo));
                     return true;
                 }
             }
@@ -111,12 +113,12 @@ namespace Tracing
         }
         #region Logging
 
-        public event OnExceptionDelegate OnLogException
+        public event OnLogExceptionDelegate OnLogException
         {
             add { _onLogExceptionHandler += value; }
             remove { _onLogExceptionHandler -= value; }
         }
-        private event OnExceptionDelegate _onLogExceptionHandler;
+        private event OnLogExceptionDelegate _onLogExceptionHandler;
         public event OnLogDelegate OnLog
         {
             add { _onLogHandler += value; }
