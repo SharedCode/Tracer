@@ -61,7 +61,8 @@ namespace Tracing.MSEnterpriseLogging
         {
             if (hookDefaultEventHandler)
             {
-                OnLog += (LogLevels logLevel, string[] cat, string message) => { Log(logLevel, cat, message); };
+                OnLogDelegate onLogEventHandler = (LogLevels logLevel, string[] cat, string message) => { Log(logLevel, cat, message); };
+                OnLog += onLogEventHandler;
                 OnLogException += LogException;
             }
         }
@@ -78,7 +79,7 @@ namespace Tracing.MSEnterpriseLogging
             }
         }
 
-        private void Log(LogLevels logLevel, string[] category, string message, Dictionary<string, object> extendedProps = null)
+        private void Log(LogLevels logLevel, string[] category, string message)
         {
             try
             {
@@ -94,8 +95,8 @@ namespace Tracing.MSEnterpriseLogging
                 //logEntry.EventId = (int)
                 //    (logLevel >= LogLevels.Warning ? 10001 : 10002);
                 logEntry.Severity = Tracer.Convert(logLevel);
-                if (extendedProps != null)
-                    logEntry.ExtendedProperties = extendedProps;
+                //if (extendedProps != null)
+                //    logEntry.ExtendedProperties = extendedProps;
                 Logger.Write(logEntry);
             }
             catch (System.Exception exc)
