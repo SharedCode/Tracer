@@ -61,8 +61,7 @@ namespace Tracing.MSEnterpriseLogging
         {
             if (hookDefaultEventHandler)
             {
-                OnLogDelegate onLogEventHandler = (LogLevels logLevel, string[] cat, string message) => { Log(logLevel, cat, message); };
-                OnLog += onLogEventHandler;
+                OnLog += Log;
                 OnLogException += LogException;
             }
         }
