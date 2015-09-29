@@ -175,11 +175,11 @@ namespace Tracing
             if (_onLogHandler == null) return;
             try
             {
-                _onLogHandler(_tracingLogLevel, Category, Format(BeforeCallingLiteral, funcFootprint));
+                _onLogHandler(_tracingLogLevel, Category, Format(MessageStrings.EnteringMessageTemplate, funcFootprint));
             }
             catch (Exception exc)
             {
-                throw new TraceException("Failed calling OnEnter event.", exc);
+                throw new TraceException(MessageStrings.OnEnterEventFailedCall, exc);
             }
         }
         internal protected override void OnLeaveHandler(object result, string funcFootprint, TimeSpan? runTime)
@@ -187,7 +187,7 @@ namespace Tracing
             if (_onLeaveHandler != null)
             {
                 if (ResultEvaluator != null)
-                    throw new NotSupportedException("Can't specify both ResultEvaluator & OnLeave event handlers.");
+                    throw new NotSupportedException(MessageStrings.UnsupportedResultEvaluatorAndOnLeave);
                 try
                 {
                     _onLeaveHandler(result, funcFootprint, runTime);
@@ -195,7 +195,7 @@ namespace Tracing
                 }
                 catch (Exception exc)
                 {
-                    throw new TraceException("Failed calling OnLeave event.", exc);
+                    throw new TraceException(MessageStrings.OnLeaveEventFailedCall, exc);
                 }
             }
             if (_onLogHandler == null) return;
@@ -203,7 +203,7 @@ namespace Tracing
             try
             {
                 if (runTime != null)
-                    message = string.Format("{0}, run time(secs): {1}", funcFootprint, runTime.Value.TotalSeconds);
+                    message = string.Format(MessageStrings.MessageWithRunTimeMessageTemplate, funcFootprint, runTime.Value.TotalSeconds);
                 string customMessage = "";
                 if (ResultEvaluator != null)
                 {
@@ -214,7 +214,7 @@ namespace Tracing
                     }
                     catch (System.Exception exc)
                     {
-                        throw new TraceException(Format("OnLeave event ResultEvaluator call failed, details: {0}.", message), exc);
+                        throw new TraceException(Format(MessageStrings.ResultEvaluatorCallFailedMessageTemplate, message), exc);
                     }
                     switch (r)
                     {
@@ -222,38 +222,38 @@ namespace Tracing
                             return;
                         case ResultActionType.Pass:
                             if (string.IsNullOrWhiteSpace(customMessage))
-                                _onLogHandler(LogLevels.Information, Category, Format("Successful call {0}.", message));
+                                _onLogHandler(LogLevels.Information, Category, Format(MessageStrings.SuccessfulCallMessageTemplate, message));
                             else
-                                _onLogHandler(LogLevels.Information, Category, Format("Successful call {0}, details: {1}.",
+                                _onLogHandler(LogLevels.Information, Category, Format(MessageStrings.SuccessfulCallWithDetailsMessageTemplate,
                                     message, customMessage));
                             return;
                         case ResultActionType.Fail:
                             if (string.IsNullOrWhiteSpace(customMessage))
-                                _onLogHandler(LogLevels.Information, Category, Format("Failed call {0}.", message));
+                                _onLogHandler(LogLevels.Information, Category, Format(MessageStrings.FailedCallMessageTemplate, message));
                             else
-                                _onLogHandler(LogLevels.Information, Category, Format("Failed call {0}, details: {1}.",
+                                _onLogHandler(LogLevels.Information, Category, Format(MessageStrings.FailedCallWithDetailsMessageTemplate,
                                     message, customMessage));
                             return;
                         case ResultActionType.Default:
                             break;
                         default:
-                            throw new NotSupportedException(string.Format("ResultAction {0} not supported.", r));
+                            throw new NotSupportedException(string.Format(MessageStrings.UnsupportedResultActionMessageTemplate, r));
                     }
                 }
                 if (string.IsNullOrWhiteSpace(customMessage))
-                    _onLogHandler(_tracingLogLevel, Category, Format(AfterCallingLiteral, message));
+                    _onLogHandler(_tracingLogLevel, Category, Format(MessageStrings.LeavingMessageTemplate, message));
                 else
-                    _onLogHandler(_tracingLogLevel, Category, Format("Leaving {0}, details: {1}.", message, customMessage));
+                    _onLogHandler(_tracingLogLevel, Category, Format(MessageStrings.LeavingWithDetailsMessageTemplate, message, customMessage));
             }
             catch (System.Exception exc)
             {
-                throw new TraceException(Format("Failed calling OnLeave event, details: {0}.", message), exc);
+                throw new TraceException(Format(MessageStrings.FailedCallMessageTemplate, message), exc);
             }
         }
         internal override protected string HandleEmptyFootprint(string footprint)
         {
             if (footprint == string.Empty)
-                return "<no function info>";
+                return MessageStrings.NoFunctionInfo;
             return footprint;
         }
 
@@ -261,7 +261,7 @@ namespace Tracing
         {
             IsSuccessful = false;
             if (_onLogHandler == null) return;
-            var errMessage = Format("Failed calling {0}, details: {1}", funcFootprint, message);
+            var errMessage = Format(MessageStrings.FailedCallWithDetailsMessageTemplate, funcFootprint, message);
             try
             {
                 _onLogHandler(LogLevels.Error, Category, errMessage);
@@ -271,8 +271,5 @@ namespace Tracing
                 OnEventExceptionHandler(EventType.OnLeave, exc, funcFootprint);
             }
         }
-
-        private const string BeforeCallingLiteral = "Entering {0}.";
-        private const string AfterCallingLiteral = "Leaving {0}.";
     }
 }

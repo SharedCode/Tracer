@@ -404,6 +404,13 @@ namespace Tracing.InvokeEngine
         private bool? _rethrow;
 
         /// <summary>
+        /// Message Strings contain all the messages emitted by InvokeWrapperBase derived classes.
+        /// Update this to your message strings structure if you have defined your custom messages
+        /// and would like to override the default messages emitted by Tracer.
+        /// </summary>
+        static public MessageStrings MessageStrings = new MessageStrings();
+
+        /// <summary>
         /// Contains the exception encountered after the last Invoke
         /// was done or null if there isn't any generated.
         /// </summary>

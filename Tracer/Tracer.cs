@@ -101,7 +101,7 @@ namespace Tracing
             {
                 if (_onLogExceptionHandler != null)
                 {
-                    _onLogExceptionHandler(exc, Category, Format("Failed calling {0}.", functionInfo));
+                    _onLogExceptionHandler(exc, Category, Format(MessageStrings.FailedCallMessageTemplate, functionInfo));
                     return true;
                 }
             }

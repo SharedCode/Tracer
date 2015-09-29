@@ -70,11 +70,11 @@ namespace Tracing.MSEnterpriseLogging
         {
             try
             {
-                Log(LogLevels.Error, category, string.Format("{0} Details: {1}", message, exc.ToString()));
+                Log(LogLevels.Error, category, string.Format(MessageStrings.MessageWithDetailsMessageTemplate, message, exc.ToString()));
             }
             catch (System.Exception logExc)
             {
-                throw new TraceException(Format("Failed logging {0}.", message), logExc);
+                throw new TraceException(Format(MessageStrings.FailedLoggingMessageTemplate, message), logExc);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Tracing.MSEnterpriseLogging
             }
             catch (System.Exception exc)
             {
-                throw new TraceException(Tracer.Format("Failed logging {0}.", message), exc);
+                throw new TraceException(Tracer.Format(MessageStrings.FailedLoggingMessageTemplate, message), exc);
             }
         }
     }

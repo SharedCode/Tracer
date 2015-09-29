@@ -38,7 +38,7 @@ namespace Tracing.InvokeEngine
             }
             catch (Exception exc)
             {
-                throw new TraceException("Failed calling OnEnter event.", exc);
+                throw new TraceException(MessageStrings.OnEnterEventFailedCall, exc);
             }
         }
         internal protected override void OnLeaveHandler(object result, string functionInfo, TimeSpan? runTime)
@@ -50,7 +50,7 @@ namespace Tracing.InvokeEngine
             }
             catch (Exception exc)
             {
-                throw new TraceException("Failed calling OnLeave event.", exc);
+                throw new TraceException(MessageStrings.OnLeaveEventFailedCall, exc);
             }
         }
     }
