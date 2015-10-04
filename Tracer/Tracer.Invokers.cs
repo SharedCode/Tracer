@@ -190,7 +190,7 @@ namespace Tracing
                     throw new NotSupportedException(MessageStrings.UnsupportedResultEvaluatorAndOnLeave);
                 try
                 {
-                    _onLeaveHandler(result, funcFootprint, runTime);
+                    _onLeaveHandler(this, result, funcFootprint, runTime);
                     return;
                 }
                 catch (Exception exc)

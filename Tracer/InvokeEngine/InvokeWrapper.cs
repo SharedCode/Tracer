@@ -34,7 +34,7 @@ namespace Tracing.InvokeEngine
             if (_onEnterHandler == null) return;
             try
             {
-                _onEnterHandler(functionInfo);
+                _onEnterHandler(this, functionInfo);
             }
             catch (Exception exc)
             {
@@ -46,7 +46,7 @@ namespace Tracing.InvokeEngine
             if (_onLeaveHandler == null) return;
             try
             {
-                _onLeaveHandler(result, functionInfo, runTime);
+                _onLeaveHandler(this, result, functionInfo, runTime);
             }
             catch (Exception exc)
             {

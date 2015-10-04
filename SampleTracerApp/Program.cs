@@ -2,6 +2,7 @@
 using System;
 using Tracing;
 using Tracing.MSEnterpriseLogging;
+using Tracing.InvokeEngine;
 
 namespace SampleTracerApp
 {
@@ -16,6 +17,11 @@ namespace SampleTracerApp
             Console.WriteLine("Running Enterprise Logging Tracer demo.");
             DemoEnterpriseTracer();
             Console.WriteLine();
+
+            Console.WriteLine("Running Enterprise Logging Tracer with CustomOnLeave event handler demo.");
+            DemoEnterpriseTracerWithCustomOnLeave();
+            Console.WriteLine();
+
             Console.WriteLine("Running Enterprise Logging Trace Scope Using ResultsEval demo.");
             DemoEnterpriseTracerWithScopeAndResultEval();
             Console.WriteLine("Pls. check your MSEL log file for messages logged by Enterprise Logging demo.");
@@ -52,6 +58,22 @@ namespace SampleTracerApp
 
             EnterpriseTracer Tracer = new EnterpriseTracer(new string[] { "DemoEnterpriseTracer" }, re);
             Tracer.Invoke(Foo, funcFootprint: "Foo()");
+        }
+
+        private static void DemoEnterpriseTracerWithCustomOnLeave()
+        {
+            EnterpriseTracer Tracer = new EnterpriseTracer(new string[] { "DemoEnterpriseTracerWithCustomOnLeave" });
+            Tracer.OnLeave += Tracer_OnLeave;
+            Tracer.Invoke(Foo, funcFootprint: "Foo()");
+        }
+        private static void Tracer_OnLeave(InvokeWrapperBase sender, object result, string funcFootprint, TimeSpan? runTime)
+        {
+            if (runTime.Value.TotalSeconds > 5)
+            {
+                Tracer_OnLog(LogLevels.Warning, ((Tracing.Tracer)sender).Category, "Too slow, 'failed!");
+                return;
+            }
+            Tracer_OnLog(LogLevels.Information, ((Tracing.Tracer)sender).Category, string.Format("Passed calling {0}.", funcFootprint));
         }
 
         private static void DemoEnterpriseTracerWithScopeAndResultEval()
@@ -177,7 +199,7 @@ namespace SampleTracerApp
         }
 
 
-        private static void Tracer_OnException(Exception exc, string functionInfo)
+        private static void Tracer_OnException(InvokeWrapperBase sender, Exception exc, string functionInfo)
         {
             var msg = string.Format("{0}, details: {1}", functionInfo, exc.ToString());
             Tracer_OnLog(LogLevels.Fatal, null, msg);

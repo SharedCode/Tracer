@@ -12,29 +12,32 @@ namespace Tracing.InvokeEngine
     /// <summary>
     /// On Exception Delegate.
     /// </summary>
+    /// <param name="sender"></param>
     /// <param name="exc"></param>
     /// <param name="funcFootprint"></param>
-    public delegate void OnExceptionDelegate(Exception exc, string funcFootprint);
+    public delegate void OnExceptionDelegate(InvokeWrapperBase sender, Exception exc, string funcFootprint);
     /// <summary>
     /// OnEvent exception delegate.
     /// </summary>
-    /// <param name="exc"></param>
+    /// <param name="sender"></param>
     /// <param name="eventType"></param>
+    /// <param name="exc"></param>
     /// <param name="message"></param>
-    public delegate void OnEventExceptionDelegate(EventType eventType, Exception exc, string message);
+    public delegate void OnEventExceptionDelegate(InvokeWrapperBase sender, EventType eventType, Exception exc, string message);
     /// <summary>
     /// OnEnter delegate.
     /// </summary>
+    /// <param name="sender"></param>
     /// <param name="funcFootprint"></param>
-    public delegate void OnEnterDelegate(string funcFootprint);
+    public delegate void OnEnterDelegate(InvokeWrapperBase sender, string funcFootprint);
     /// <summary>
     /// OnLeave event delegate.
     /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <param name="result">Result of the method invoked or null if it is void method.</param>
+    /// <param name="sender"></param>
+    /// <param name="result"></param>
     /// <param name="funcFootprint"></param>
     /// <param name="runTime"></param>
-    public delegate void OnLeaveDelegate(object result, string funcFootprint, TimeSpan? runTime);
+    public delegate void OnLeaveDelegate(InvokeWrapperBase sender, object result, string funcFootprint, TimeSpan? runTime);
     #endregion
 
     /// <summary>
@@ -97,7 +100,7 @@ namespace Tracing.InvokeEngine
             //    return;
             if (_onExceptionHandler == null)
                 return false;
-            _onExceptionHandler(exc, funcFootprint);
+            _onExceptionHandler(this, exc, funcFootprint);
             return true;
         }
         /// <summary>
@@ -108,7 +111,7 @@ namespace Tracing.InvokeEngine
         {
             if (_onEventExceptionHandler == null)
                 throw exc;
-            _onEventExceptionHandler(eventType, exc, funcFootprint);
+            _onEventExceptionHandler(this, eventType, exc, funcFootprint);
         }
         #endregion
     }
