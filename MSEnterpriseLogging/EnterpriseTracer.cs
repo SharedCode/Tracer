@@ -68,14 +68,7 @@ namespace Tracing.MSEnterpriseLogging
 
         private void LogException(System.Exception exc, string[] category, string message)
         {
-            try
-            {
-                Log(LogLevels.Error, category, string.Format(MessageStrings.MessageWithDetailsMessageTemplate, message, exc.ToString()));
-            }
-            catch (System.Exception logExc)
-            {
-                throw new TraceException(Format(MessageStrings.FailedLoggingMessageTemplate, message), logExc);
-            }
+            Log(LogLevels.Error, category, string.Format(MessageStrings.MessageWithDetailsMessageTemplate, message, exc.ToString()));
         }
 
         private void Log(LogLevels logLevel, string[] category, string message)
@@ -105,3 +98,4 @@ namespace Tracing.MSEnterpriseLogging
         }
     }
 }
+
